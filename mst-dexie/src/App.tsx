@@ -84,16 +84,8 @@ const App = observer(() => {
         {store.prescriptionStore.prescriptions.map((p) => (
           <li key={p.id}>
             {p.medicineName} - {p.dosage} ({moment(p.date).format("LT")})<br />
-            Patient:{" "}
-            {p.patient ? (
-              <strong>{p.patient.name}</strong>
-            ) : (
-              <em>❌ Unknown</em>
-            )}
-            <button
-              onClick={() => handleRemovePrescription(p.id)}
-              style={{ marginLeft: "12px" }}
-            >
+            Patient: {p.patient ? <strong>{p.patient.name}</strong> : <em>❌ Unknown</em>}
+            <button onClick={() => handleRemovePrescription(p.id)} style={{ marginLeft: "12px" }}>
               ❌
             </button>
           </li>

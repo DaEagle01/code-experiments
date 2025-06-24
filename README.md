@@ -27,7 +27,7 @@ This repo is not a production project or client work. Instead, it’s a collecti
 
 Each folder is a focused experiment or learning sandbox.
 
-- [`mst-dexie`](./mst-dexie) — — modular MST + Dexie setup featuring nested models, hydration, lifecycle hooks, and full offline CRUD — built for real-world structure
+- [`mst-dexie`](./mst-dexie) — — modular MST + Dexie setup featuring nested models, model referencing, hydration, lifecycle hooks, and full offline CRUD — built for real-world structure
 
 More coming soon...
 

@@ -1,10 +1,4 @@
-import {
-  types,
-  flow,
-  type Instance,
-  getSnapshot,
-  addDisposer,
-} from "mobx-state-tree";
+import { types, flow, type Instance, getSnapshot, addDisposer } from "mobx-state-tree";
 import { Prescription } from "./PrescriptionModel";
 import { db, type PrescriptionDBSchema } from "../db";
 import { reaction } from "mobx";
@@ -27,13 +21,7 @@ export const PrescriptionStore = types
     },
   }))
   .actions((self) => ({
-    addPrescription: ({
-      id,
-      medicineName,
-      dosage,
-      date,
-      patientId,
-    }: NewPrescriptionInput) => {
+    addPrescription: ({ id, medicineName, dosage, date, patientId }: NewPrescriptionInput) => {
       const newRx = {
         id,
         medicineName,
@@ -64,9 +52,7 @@ export const PrescriptionStore = types
         () => self.prescriptions.map((p) => getSnapshot(p)),
         (snapshotArray) => {
           db.prescriptions.bulkPut(
-            snapshotArray.filter(
-              (p) => p.patient !== undefined
-            ) as PrescriptionDBSchema[]
+            snapshotArray.filter((p) => p.patient !== undefined) as PrescriptionDBSchema[]
           );
           console.log("💾 Auto-saved prescriptions to Dexie");
         }
