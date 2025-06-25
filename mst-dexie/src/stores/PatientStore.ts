@@ -1,7 +1,7 @@
 import { types, flow, getSnapshot, addDisposer } from "mobx-state-tree";
 import { reaction } from "mobx";
-import { Patient, type IPatient } from "./PatientModel";
 import { db } from "../db";
+import { Patient, type IPatient } from "../models/PatientModel";
 
 export const PatientStore = types
   .model("PatientStore", {

@@ -1,7 +1,7 @@
 import { types, flow, type Instance, getSnapshot, addDisposer } from "mobx-state-tree";
-import { Prescription } from "./PrescriptionModel";
 import { db, type PrescriptionDBSchema } from "../db";
 import { reaction } from "mobx";
+import { Prescription } from "../models/PrescriptionModel";
 
 export type NewPrescriptionInput = {
   id: string;
