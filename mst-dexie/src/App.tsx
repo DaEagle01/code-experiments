@@ -6,10 +6,10 @@ const App = observer(() => {
   return (
     <div className="min-h-screen">
       {/* Uses MST + Dexie */}
-      {/* <CreatePatientAndPrescription /> */}
+      <CreatePatientAndPrescription />
 
       {/* Uses MST + plain IndexedDB */}
-      <MedicineDashboard />
+      {/* <MedicineDashboard /> */}
     </div>
   );
 });

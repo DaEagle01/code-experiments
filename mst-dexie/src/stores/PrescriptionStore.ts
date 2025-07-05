@@ -1,7 +1,8 @@
 import { types, flow, type Instance, getSnapshot, addDisposer } from "mobx-state-tree";
 import { db, type PrescriptionDBSchema } from "../db";
 import { reaction } from "mobx";
-import { Prescription } from "../models/PrescriptionModel";
+import { Prescription, type IPrescription } from "../models/PrescriptionModel";
+import { store } from "./RootStore";
 
 export type NewPrescriptionInput = {
   id: string;
@@ -38,25 +39,56 @@ export const PrescriptionStore = types
 
     loadFromDexie: flow(function* () {
       try {
-        const all = yield db.prescriptions.toArray();
-        self.prescriptions = all;
+        // Ensure patient store is hydrated before using MST references
+        const all: IPrescription[] = yield db.prescriptions.toArray();
+
+        const validPrescriptions = all
+          // Only keep prescriptions that point to existing patients
+          .filter((prescription) =>
+            store.patientStore.patients.some(
+              (patient) => patient.id === String(prescription.patient)
+            )
+          )
+          // Convert Dexie objects to MST-compatible snapshots
+          .map((prescription) => ({
+            id: prescription.id,
+            medicineName: prescription.medicineName,
+            dosage: prescription.dosage,
+            date: prescription.date,
+            patient: prescription.patient, // MST will resolve this as a reference
+          }));
+
+        self.prescriptions.replace(validPrescriptions);
       } catch (err) {
-        console.error("Dexie load failed", err);
+        console.error("❌ Failed to load prescriptions from Dexie", err);
       }
     }),
   }))
   // 🔁 Auto save to Dexie when prescriptions change
   .actions((self) => ({
     afterCreate() {
+      let previousIds: string[] = [];
+
       const disposer = reaction(
         () => self.prescriptions.map((p) => getSnapshot(p)),
         (snapshotArray) => {
+          const currentIds = snapshotArray.map((p) => p.id);
+          const deletedIds = previousIds.filter((id) => !currentIds.includes(id));
+          previousIds = currentIds;
+
+          if (deletedIds.length) {
+            db.prescriptions.bulkDelete(deletedIds);
+            console.log("🗑 Deleted prescriptions from Dexie:", deletedIds);
+          }
+
           db.prescriptions.bulkPut(
             snapshotArray.filter((p) => p.patient !== undefined) as PrescriptionDBSchema[]
           );
           console.log("💾 Auto-saved prescriptions to Dexie");
-        }
+        },
+        { fireImmediately: true }
       );
+
       addDisposer(self, disposer);
     },
   }));
